@@ -109,7 +109,7 @@ Surrogate variables are meant to mimic the split of a primary variable so it mak
 
 ## Question 11
 
-Let us define $\alpha_{N} := \displaystyle \sum_{i=1}^{N}[ y_{i}^{2} - 2y_{i}\sum_{m=1}^{M}c_{m}I(\boldsymbol x_{i} \in \mathcal{R_{m}}) + \sum_{1 \leq l,m \leq M} c_{m}c_{l}I(\boldsymbol x_{i} \in \mathcal{R_{m}})I(\boldsymbol x_{i} \in \mathcal{R_{l}})]$. Then we have for $m \in \{1, \ldots,M\}$: $\frac{\partial \alpha_{N}}{\partial c_{m}} = 0 - 2 \displaystyle \sum_{i=1}^{N}[I(\boldsymbol x_{i} \in \mathcal{R_{m}}) + c_{m}I(\boldsymbol x_{i} \in \mathcal{R_{m}})]$. Finally since $\hat{c}_{m}$ satisfies $\frac{\partial \alpha_{N}}{\partial c_{m}} = 0$, we have the result.
+Let us define $\alpha_{N} := \displaystyle \sum_{i=1}^{N}[ y_{i}^{2} - 2y_{i}\sum_{m=1}^{M}c_{m}I(\boldsymbol x_{i} \in \mathcal{R}_{m}) + \sum_{1 \leq l,m \leq M} c_{m}c_{l}I(\boldsymbol x_{i} \in \mathcal{R}_{m})I(\boldsymbol x_{i} \in \mathcal{R}_{l}\})]$. Then we have for $m \in \{1, \ldots,M\}$: $\frac{\partial \alpha_{N}}{\partial c_{m}} = 0 - 2 \displaystyle \sum_{i=1}^{N}[I(\boldsymbol x_{i} \in \mathcal{R_{m}}) + c_{m}I(\boldsymbol x_{i} \in \mathcal{R}_{m})]$. Finally since $\hat{c}_{m}$ satisfies $\frac{\partial \alpha_{N}}{\partial c_{m}} = 0$, we have the result.
 
 
 ## Question 12 
