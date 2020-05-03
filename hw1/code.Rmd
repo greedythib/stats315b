@@ -30,12 +30,12 @@ summary(tree)
 
 ```
 
-The plot of the tree shows $7$ splits and $15$ nodes (leaves included). We also notice that there is not prediction for people who are between 55 and 64 years old. It seems relevant that the marital status is a great split to classify since the population gets married or dies at 
-approximately the same age. Then education and occupation are also good splits because they gather people with the same age, and reached almost everybody. 
+The plot of the tree shows $7$ splits and $15$ nodes (leaves included). We also notice that there is no prediction for people who are between 55 and 64 years old. It seems relevant that the marital status is a great split variable to classify since the overall population gets married/dies at 
+approximately the same age. Furthermore, education and occupation are also good split variables because people are gathered according to their age. For instance, most people at highschool have the same age.
 
 ### (a)
 
-Yes, some surrogates variables were used during the construction. Let us give an explanation of the output from `summary(tree)` : for the root node that usea the marital status to do the split, there were no missing values so there was no need to use any surrogate variables. Conversely, for node 2 (`Education`) there were $38$ missing values and the surrogate variable `Under18` was used to handle these missing values. 
+Yes, some surrogates variables were used during the construction. Let us give an explanation of the output from `summary(tree)` : for the root node that uses the marital status to do the split, there were no missing values so there was no need to use any surrogate variables. Conversely, for node 2 (`Education`) there were $38$ missing values and the surrogate variable `Under18` was used to handle these missing values. 
 
 ### (b)
 
@@ -69,13 +69,13 @@ table(housetype$TypeHome, fit.val)
 # 1 - (sum(diag(c)))/length(fit.val_pruned)
 
 ```
-The model returns an optimal tree with $4$ splits and $9$ nodes. It is surprising to notice that only class 1 and 3 are predicted by the model. It is probably due to the fact that $86$ % of the data represents these two classes but this is still a weakness of the model. We can also see that the prediction of class 1 is straightfoward in most cases. Indeed, when people fall in the 'Own' category, they are directly predicted as "House", which makes sense. 
+The model returns an optimal tree with $3$ splits and $7$ nodes. It is surprising to notice that only class 1 and 3 are predicted by the model. It is probably due to the fact that $86$ % of the data represents these two classes but this is still a weakness of the model. We can also see that the prediction of class 1 is straightfoward in most cases. Indeed, when people fall in the 'Own' category, they are directly predicted as "House", which makes sense. 
 The misclassification error with the optimal tree is : $0.2620659$. As an alternative example, with a pruned tree that provides $2$ splits, the misclassification error becomes $0.2763786$. 
 
 
 ## Question 3 
 
-* Reason 1 : If our model is not trained enough, we will underfit the data and consequently, when trying to do predicitions on another set of data, we will get large errors. In other words, there is an important bias in our model. 
+* Reason 1 : If our model is not trained enough, we will underfit the data and consequently, when trying to do predicitions on another set of data, we will get large errors. In other words, there is an important bias in our model because of too restrictive assumptions. 
 * Reason 2 : Conversely, if our model is too much trained, it will overfit the data used to build it. Therefore, when testing it, we will also get large errors because our model will do predictions by only using the training dataset structure and relationships. This error is due to a high variance in our model that is responsible for high sensitivity to small fluctuations.  
 
 ## Question 4 
