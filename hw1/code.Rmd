@@ -22,9 +22,6 @@ age <- read.csv("handout/Data/age_stats315B.csv", header= T)
 for (i in 1:ncol(age)){
   age[,i] <- as.factor(age[,i])
 }
-# Y = age[,1]
-# X = age[,-1]
-# tree <- rpart(Y~X)
 tree <- rpart(age ~., data = age, method = "class")
 rpart.plot(tree)
 summary(tree)
@@ -56,9 +53,12 @@ Therefore my predicted age is 18 - 24 years olds which is great because I am 23.
 
 ```{r}
 housetype <- read.csv("handout/Data/housetype_stats315B.csv", header =T)
+for (i in 1:ncol(housetype)){
+  housetype[,i] <- as.factor(housetype[,i])
+}
 housetype_tree <- rpart(TypeHome ~. , data = housetype, method = "class")
 rpart.plot(housetype_tree)
-fit.val <- predict(housetype_tree, housetype[,-1], type="class")
+fit.val <- predict(housetype_tree, housetype[,-1], type = "class")
 table(housetype$TypeHome, fit.val)
 1 - (sum(diag(table(housetype$TypeHome, fit.val))))/length(fit.val)
 
@@ -92,7 +92,7 @@ No it cannot always be a good surrogate for prediction risk. Indeed, prediction 
 
 ## Question 7 
 
-Let us assume that the misclassification loss $l_{l,k} = l(c_{l}, c_{k})$ is such that : $\boxed{l_{l,k} = \mathbb{1}_{k \neq l}}$. Then the misclassification risk when predicting $c(\underline{X}) = c_{k}$ is given by $r_{k} = \mathbb{E}_{Y, \underline{X}}(l(Y,c_{k})) = \displaystyle \sum_{l=1}^{K} l_{l,k} \mathbb{P}(\{Y = c_{l}| \underline{X} \}) = 1 - \mathbb{P}(Y=c_{k}|\underline{X})  = \mathbb{P}(Y \neq c_{k}| \underline{X})$. The latter is equal to the error rate. Then Bayes optimal prediction rule satisfies : $\boxed{k^{*} = arg \min_{1 \leq k \leq K}\mathbb{P}(Y \neq c_{k}| \underline{X})}$ with the optimal classifier $c^{*}(\underline{X}) = k^{*}$.  
+Let us assume that the misclassification loss $l_{l,k} = l(c_{l}, c_{k})$ is such that : $\boxed{l_{l,k} = I({k \neq l}})$. Then the misclassification risk when predicting $c(\underline{X}) = c_{k}$ is given by $r_{k} = \mathbb{E}_{Y, \underline{X}}(l(Y,c_{k})) = \displaystyle \sum_{l=1}^{K} l_{l,k} \mathbb{P}(\{Y = c_{l}| \underline{X} \}) = 1 - \mathbb{P}(Y=c_{k}|\underline{X})  = \mathbb{P}(Y \neq c_{k}| \underline{X})$. The latter is equal to the error rate. Then Bayes optimal prediction rule satisfies : $\boxed{k^{*} = arg \min_{1 \leq k \leq K}\mathbb{P}(Y \neq c_{k}| \underline{X})}$ with the optimal classifier $c^{*}(\underline{X}) = k^{*}$.  
 
 
 ## Question 8 
