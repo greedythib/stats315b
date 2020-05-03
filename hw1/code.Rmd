@@ -2,29 +2,148 @@
 title: "STATS305B - HW1"
 author: "Thibaud Bruyelle"
 date: "5/1/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Question 1 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r cars}
-summary(cars)
+library(rpart)
+library(rpart.plot)
+# Question 1 
+age <- read.csv("handout/Data/age_stats315B.csv", header= T)
+for (i in 1:ncol(age)){
+  age[,i] <- as.factor(age[,i])
+}
+# Y = age[,1]
+# X = age[,-1]
+# tree <- rpart(Y~X)
+tree <- rpart(age ~., data = age, method = "class")
+rpart.plot(tree)
+summary(tree)
+# pruned <- prune(tree, cp = 0.012699)
+# rpart.plot(pruned)
+
 ```
 
-## Including Plots
+The plot of the tree shows $7$ splits and $15$ nodes (leaves included). We also notice that there is not prediction for people who are between 55 and 64 years old. It seems relevant that the marital status is a great split to classify since the population gets married or dies at 
+approximately the same age. Then education and occupation are also good splits because they gather people with the same age, and reached almost everybody. 
 
-You can also embed plots, for example:
+### (a)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Yes, some surrogates variables were used during the construction. Let us give an explanation of the output from `summary(tree)` : for the root node that usea the marital status to do the split, there were no missing values so there was no need to use any surrogate variables. Conversely, for node 2 (`Education`) there were $38$ missing values and the surrogate variable `Under18` was used to handle these missing values. 
+
+### (b)
+
+```{r}
+new = matrix(ncol = 13, nrow =1)
+new = data.frame(new)
+new[1,] = as.factor(c(6,3,1,5,6,1,1,1,4,0,2,7,3))
+colnames(new) <- colnames(age)[-1]
+print(predict(tree, new))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Therefore my predicted age is 18 - 24 years olds which is great because I am 23.
+
+## Question 2 
+
+```{r}
+housetype <- read.csv("handout/Data/housetype_stats315B.csv", header =T)
+housetype_tree <- rpart(TypeHome ~. , data = housetype, method = "class")
+rpart.plot(housetype_tree)
+fit.val <- predict(housetype_tree, housetype[,-1], type="class")
+table(housetype$TypeHome, fit.val)
+1 - (sum(diag(table(housetype$TypeHome, fit.val))))/length(fit.val)
+
+# pruned <- prune(housetype_tree, cp = 0.1)
+# rpart.plot(pruned)
+# fit.val_pruned <- predict(pruned, housetype[,-1], type="class")
+# c = table(actual = housetype$TypeHome, fitted = fit.val_pruned)
+# 1 - (sum(diag(c)))/length(fit.val_pruned)
+
+```
+The model returns an optimal tree with $4$ splits and $9$ nodes. It is surprising to notice that only class 1 and 3 are predicted by the model. It is probably due to the fact that $86$ % of the data represents these two classes but this is still a weakness of the model. We can also see that the prediction of class 1 is straightfoward in most cases. Indeed, when people fall in the 'Own' category, they are directly predicted as "House", which makes sense. 
+The misclassification error with the optimal tree is : $0.2620659$. As an alternative example, with a pruned tree that provides $2$ splits, the misclassification error becomes $0.2763786$. 
+
+
+## Question 3 
+
+* Reason 1 : If our model is not trained enough, we will underfit the data and consequently, when trying to do predicitions on another set of data, we will get large errors. In other words, there is an important bias in our model. 
+* Reason 2 : Conversely, if our model is too much trained, it will overfit the data used to build it. Therefore, when testing it, we will also get large errors because our model will do predictions by only using the training dataset structure and relationships. This error is due to a high variance in our model that is responsible for high sensitivity to small fluctuations.  
+
+## Question 4 
+
+We cannot chose a predicition function among all possible functions for complexity purposes. We need to put constraints and restrictions when we search for the best predicitor because otherwise it would be beyond our computational abilities. 
+
+## Question 5
+
+The target function $f^{*}$ can be defiend as : $arg\min_{f} \mathbb{E}(l(f(X),Y))$ where $l$ is the loss function. In other words, the target function is the function that, for a given measure of the loss, will minimize the error in our predictions. The accuracy of a target function depends on the constraints of the class of functions we are working on and also to the nature of the problem. 
+
+## Question 6
+
+No it cannot always be a good surrogate for prediction risk. Indeed, prediction error on the training data can be very low but if our model is overfitted, then the error on the actual population will be much higher. As an example, classification trees are prone to high variance so they easily overfit.If there is no overfitting and underfitting, it might be an option to use the empirical risk classification. 
+
+## Question 7 
+
+Let us assume that the misclassification loss $l_{l,k} = l(c_{l}, c_{k})$ is such that : $\boxed{l_{l,k} = \mathbb{1}_{k \neq l}}$. Then the misclassification risk when predicting $c(\underline{X}) = c_{k}$ is given by $r_{k} = \mathbb{E}_{Y, \underline{X}}(l(Y,c_{k})) = \displaystyle \sum_{l=1}^{K} l_{l,k} \mathbb{P}(\{Y = c_{l}| \underline{X} \}) = 1 - \mathbb{P}(Y=c_{k}|\underline{X})  = \mathbb{P}(Y \neq c_{k}| \underline{X})$. The latter is equal to the error rate. Then Bayes optimal prediction rule satisfies : $\boxed{k^{*} = arg \min_{1 \leq k \leq K}\mathbb{P}(Y \neq c_{k}| \underline{X})}$ with the optimal classifier $c^{*}(\underline{X}) = k^{*}$.  
+
+
+## Question 8 
+
+It is not always true because wrong estimates of $(\mathbb{P}(Y \neq c_{k}|\underline{X}))_{1 \leq k \leq K}$ can lead to a low error rate (by choosing the wrong optimal rule and then computing the wrong error rate). In this case, we would be mistaken if we thought that our estimations og these probabilities are good. 
+
+## Question 9
+
+We are always looking for models with small bias (when we do too restrictive assumptions) and small variance (high sensitivity to small fluctuations usually caused by overfitting). However models with small variance usually have a high bias and on the contrary, models with small bias have a high variance. As a consequence, there is tradeoff between these two effects that we want to minimize. 
+
+## Question 10 
+
+Surrogate variables are meant to mimic the split of a primary variable so it makes no sense to use them as primary split variables because the split is not computed with respect to the same criteria. A good surrogate variable may not behave as a good primary variable. Sometimes a variable can be both a primary split variable and a surrogate split variable. We will notice that the way this variable is splitted in both cases is different because it is not meant to have the same functionalities. 
+
+## Question 11
+
+Let us define $\alpha_{N} := \displaystyle \sum_{i=1}^{N}[ y_{i}^{2} - 2y_{i}\sum_{m=1}^{M}c_{m}I(\boldsymbol x_{i} \in \mathcal{R_{m}}) + \sum_{1 \leq l,m \leq M} c_{m}c_{l}I(\boldsymbol x_{i} \in \mathcal{R_{m}})I(\boldsymbol x_{i} \in \mathcal{R_{l}})]$. Then we have for $m \in \{1, \ldots,M\}$: $\frac{\partial \alpha_{N}}{\partial c_{m}} = 0 - 2 \displaystyle \sum_{i=1}^{N}[I(\boldsymbol x_{i} \in \mathcal{R_{m}}) + c_{m}I(\boldsymbol x_{i} \in \mathcal{R_{m}})]$. Finally since $\hat{c}_{m}$ satisfies $\frac{\partial \alpha_{N}}{\partial c_{m}} = 0$, we have the result.
+
+
+## Question 12 
+
+After such a split, $F(\boldsymbol x)$ becomes $G(\boldsymbol x) = \displaystyle \sum_{l=1}^{M+1}c_{m}I(\boldsymbol x \in \mathcal{R}_{m})$. The difference of estimated risk is : 
+$$\hat{r}_{F} - \hat{r}_{G} = \sum_{i} (y_{i} - \hat{F}(\boldsymbol x_{i}))^{2} - (y_{i} - \hat{G}(\boldsymbol x_{i}))^{2}  \quad (1)$$
+
+We can notice that : $\hat{c}_{l,r} = \overline{y}_{l,r}$ and that $\hat{c}_{m} = \frac{1}{n}(n_{l} \overline{y_{l}} + n_{r} \overline{y_{r}})$. So finally we can rewrite $(1)$ as : 
+$$\sum_{i=1}^{N}[2y_{i}(c_{l}I(\boldsymbol x_{i} \in \mathcal{R}_{l})+ c_{r}I(\boldsymbol x_{i} \in \mathcal{R}_{r}) - c_{m}I(\boldsymbol x_{i} \in \mathcal{R}_{m}))+ c_{m}^{2}I(\boldsymbol x_{i} \in \mathcal{R}_{m}) - c_{l}^{2}I(\boldsymbol x_{i} \in \mathcal{R}_{l}) - c_{r}^{2}I(\boldsymbol x_{i} \in \mathcal{R}_{r})]$$
+By replacing $c$ by $\hat{c}$, we get : 
+$$2[n_{l}\overline{y}_{l}^{2} + n_{r}\overline{y}_{r}^{2} - \frac{1}{n}(n_{l}\overline{y}_{l} + n_{r}\overline{y}_{r})^{2}] - n\times \frac{1}{n^{2}}(n_{l}\overline{y}_{l} + n_{r}\overline{y}_{r})^{2} - n_{l}\overline{y}_{l}^{2} - n_{r}\overline{y}_{r}^{2}$$
+
+
+It yields to : 
+
+$$-\frac{2}{n}n_{l}n_{r}\overline{y}_{l}\overline{y}_{r} +(n_{l} - \frac{n_{l}^{2}}{n})\overline{y}_{l}^{2} - (n_{r} - \frac{n_{r}^{2}}{n})\overline{y}_{r}^{2} = \frac{n_{l}n_{r}}{n}(\overline{y}_{l} - \overline{y}_{r})^{2}$$
+
+since $n = n_{l} + n_{r}$.
+
+## Question 13 
+
+Let us assume that $y_{o}$ changes from $\mathcal{R}_{l}$ to $\mathcal{R}_{r}$. Then $\overline{y}_{l, new} \leftarrow \frac{n_{l}}{n_{l}-1}\overline{y}_{l, old} - \frac{y_{o}}{n_{l}-1}$ and $\overline{y}_{r, new} \leftarrow \frac{n_{r}}{n_{r}+1}\overline{y}_{r, old} + \frac{y_{o}}{n_{r}+1}$. As a consequence, the new improvement can be written as : 
+$$\boxed{\frac{(n_{l}-1)(n_{r} +1)}{n}(\frac{n_{l}}{n_{l}-1}\overline{y}_{l, old} - \frac{y_{o}}{n_{l}-1} -  \frac{n_{r}}{n_{r}+1}\overline{y}_{r, old} - \frac{y_{o}}{n_{r}+1})^{2}}$$
+
+
+## Question 14 
+
+Enlarging the class of functions to get a better MSE is good idea as long as it requires affordable computational cost. Usually it will reduce the MSE on future data but if the _true_ function holds in a smaller class (_e.g._ linear function when we look for more complex polynomial functions), it will overfit the data and MSE will not be better on these data. Conversely, reducing the class of functions can be great for complexity purposes. Nonetheless it implies that our model will be more biased and probably the MSE will be high on future data. 
+
+## Question 15 
+
+One advantadge would be the ability to predict more than two subgroups at each node of the tree. It will be a means to represent more complex patterns in the data. Nonetheless the splits at such a node could become meaningless and less effective. Knowing whether we should do such a split appears to be another issue. 
+
+## Question 16 
+
+With such relationships, the split could approximate linear patterns that exist within the training data which can be great in some cases. If such relationships between the inputs do not exist (because it might simpler or even more complex, ie, quadratic), the model will be error-proned or with a really high variance. 
+
